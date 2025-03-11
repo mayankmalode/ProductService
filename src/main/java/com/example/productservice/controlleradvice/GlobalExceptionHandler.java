@@ -1,6 +1,7 @@
 package com.example.productservice.controlleradvice;
 
 import com.example.productservice.dtos.ExceptionDto;
+import com.example.productservice.exceptions.ProductNotFoundException;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +44,20 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_ACCEPTABLE
         );
 
+        return response;
+    }
+
+    //ProductNotFoundException
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ExceptionDto> handleProductNotFoundException(){
+        ExceptionDto exceptionDto = new ExceptionDto();
+        exceptionDto.setMessage("Product Not Found");
+        exceptionDto.setSolution("Please try again with a valid product id");
+
+        ResponseEntity<ExceptionDto> response = new ResponseEntity<>(
+                exceptionDto,
+                HttpStatus.NOT_FOUND
+        );
         return response;
     }
 }

@@ -1,8 +1,10 @@
 package com.example.productservice.controllers;
 
+import com.example.productservice.exceptions.ProductNotFoundException;
 import com.example.productservice.models.Product;
 import com.example.productservice.services.FakeStoreProductService;
 import com.example.productservice.services.ProductService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +16,8 @@ import java.util.List;
 public class ProductController {
     private ProductService productService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(@Qualifier("selfProductService")
+            ProductService productService) {
         this.productService = productService;
     }
 
@@ -32,14 +35,22 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
-    public void deleteProduct(Long productId){}
+    @DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable("id") Long productId){
+        productService.deleteProduct(productId);
+    }
 
     @PatchMapping("/{id}")
-    public Product updateProduct(@PathVariable("name") Long id, @RequestBody Product product){
+    public Product updateProduct(@PathVariable("id") Long id, @RequestBody Product product) throws ProductNotFoundException {
         return productService.updateProduct(id, product);
     }
     @PutMapping("/{id}")
-    public  Product replaceProduct(@PathVariable("id") Long id, @RequestBody Product product){
+    public  Product replaceProduct(@PathVariable("id") Long id, @RequestBody Product product) throws ProductNotFoundException {
         return productService.replaceProduct(id, product);
+    }
+
+    @PostMapping
+    public Product addNewProduct(@RequestBody Product product){
+        return productService.addNewProduct(product);
     }
 }

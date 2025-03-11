@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Service("fakeStoreProductService")
 public class FakeStoreProductService implements ProductService{
     private RestTemplate restTemplate;
 
@@ -72,6 +72,11 @@ public class FakeStoreProductService implements ProductService{
     @Override
     public void deleteProduct(Long id) {
         throw new ArithmeticException();
+    }
+
+    @Override
+    public Product addNewProduct(Product product) {
+        return null;
     }
 
     private Product convertFakeStoreProductDtoToProduct(FakeStoreProductDto fakeStoreProductDto) {
