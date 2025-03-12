@@ -78,12 +78,14 @@ public class SelfProductService implements ProductService {
 
     @Override
     public Product addNewProduct(Product product) {
-        Category category = product.getCategory();
 
-        if(category != null) {
-            category = categoryRepository.save(category);
-            product.setCategory(category);
-        }
+//        /**** CascadeType.Persist in Product class ****/
+//        Category category = product.getCategory();
+//
+//        if(category != null) {
+//            category = categoryRepository.save(category);
+//            product.setCategory(category);
+//        }
 
         return productRepository.save(product);
     }
