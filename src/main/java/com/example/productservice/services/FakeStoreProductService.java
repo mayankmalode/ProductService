@@ -3,6 +3,8 @@ package com.example.productservice.services;
 import com.example.productservice.dtos.FakeStoreProductDto;
 import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpMessageConverterExtractor;
@@ -31,7 +33,7 @@ public class FakeStoreProductService implements ProductService{
     }
 
     @Override
-    public List<Product> getAllProducts() {
+    public Page<Product> getAllProducts(int pageNumber, int pageSize) {
         FakeStoreProductDto[] fakeStoreProductDtos = restTemplate.getForObject(
                 "https://fakestoreapi.com/products", FakeStoreProductDto[].class);
 
@@ -40,7 +42,7 @@ public class FakeStoreProductService implements ProductService{
         for(FakeStoreProductDto fakeStoreProductDto : fakeStoreProductDtos){
             products.add(convertFakeStoreProductDtoToProduct(fakeStoreProductDto));
         }
-        return products;
+        return new PageImpl<>(products);
     }
 
     @Override
