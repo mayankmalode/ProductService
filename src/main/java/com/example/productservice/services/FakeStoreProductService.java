@@ -5,6 +5,7 @@ import com.example.productservice.models.Category;
 import com.example.productservice.models.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpMessageConverterExtractor;
@@ -18,18 +19,33 @@ import java.util.List;
 @Service("fakeStoreProductService")
 public class FakeStoreProductService implements ProductService{
     private RestTemplate restTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
-    public FakeStoreProductService(RestTemplate restTemplate) {
+    public FakeStoreProductService(RestTemplate restTemplate, RedisTemplate<String, String> redisTemplate) {
         this.restTemplate = restTemplate;
+        this.redisTemplate = redisTemplate;
     }
     @Override
     public Product getSingleProduct(Long productId) {
+        //Try to fetch the product from Redis
+        Product product = (Product) redisTemplate.opsForHash().get("PRODUCTS", "PRODUCT_" + productId);
+
+        if(product != null) {
+            //Cache HIT
+            return product;
+        }
+
         //Call FakeStore to fetch the Product with given id. --> HTTP Call.
         FakeStoreProductDto fakeStoreProductDto = restTemplate.getForObject(
                 "https://fakestoreapi.com/products/" + productId, FakeStoreProductDto.class);
 
         //Convert FakeStoreProductDto into Product.
-        return convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
+        //Cache MISS
+        product = convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
+
+        //Store the product in redis.
+        redisTemplate.opsForHash().put("PRODUCTS", "PRODUCT_" + productId, product);
+        return product;
     }
 
     @Override
