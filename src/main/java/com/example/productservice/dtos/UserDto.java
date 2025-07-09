@@ -1,6 +1,5 @@
 package com.example.productservice.dtos;
 
-import com.example.userservice.models.User;
 import lombok.Getter;
 import lombok.Setter;
 
